@@ -1,47 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>NEUROVERBS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body{font-family:Arial;background:#0b1220;color:#fff;margin:0;padding:20px}
+    header{display:flex;justify-content:space-between;align-items:center}
+    select,button{padding:8px;border-radius:6px}
+    .row{margin:10px 0}
+    .lbRow{margin:4px 0}
+  </style>
+</head>
+<body>
 
-<!-- PATCHED NEUROVERBS.HTML -->
-<!-- Changes:
-1) Fixed group/day selectors logic
-2) Removed duplicate core.js include
-3) Groups init inline (safe)
--->
+<header>
+  <div>
+    <strong id="userName">Usuario</strong><br>
+    <small id="userEmail"></small>
+  </div>
+  <button onclick="logout()">Cerrar sesión</button>
+</header>
 
+<hr>
 
-<script>
-/* === GROUP & DAY INIT (SAFE PATCH) === */
-(function(){
-  const GROUPS = ["10°1","10°2","10°3","10°4","11°1","11°2","11°3"];
-  const DAYS = Array.from({length:80}, (_,i)=>`Día ${i+1}`);
+<div class="row">
+  <label>Grupo:</label>
+  <select id="groupSelect"></select>
+</div>
 
-  function fill(id, items, ph){
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.innerHTML = "";
-    const o = document.createElement("option");
-    o.value=""; o.textContent=ph; o.disabled=true; o.selected=true;
-    el.appendChild(o);
-    items.forEach(v=>{
-      const opt=document.createElement("option");
-      opt.value=v; opt.textContent=v;
-      el.appendChild(opt);
-    });
-  }
+<div class="row">
+  <label>Día:</label>
+  <select id="daySelect"></select>
+</div>
 
-  window.addEventListener("DOMContentLoaded", ()=>{
-    fill("sel-grupo", GROUPS, "Selecciona grupo");
-    fill("sel-dia", DAYS, "Selecciona día");
+<hr>
 
-    const sg = localStorage.getItem("nv_group");
-    const sd = localStorage.getItem("nv_day");
-    if(sg) document.getElementById("sel-grupo").value = sg;
-    if(sd) document.getElementById("sel-dia").value = sd;
+<h3>🏆 Ranking</h3>
+<div id="lbStatus"></div>
+<div id="leaderboardList"></div>
+<button onclick="lbPrev()">◀</button>
+<button onclick="lbNext()">▶</button>
 
-    document.getElementById("sel-grupo").onchange = e=>{
-      localStorage.setItem("nv_group", e.target.value);
-    };
-    document.getElementById("sel-dia").onchange = e=>{
-      localStorage.setItem("nv_day", e.target.value);
-    };
-  });
-})();
-</script>
+<script src="core.js"></script>
+<script src="groups.js"></script>
+<script src="leaderboard.js"></script>
+</body>
+</html>
