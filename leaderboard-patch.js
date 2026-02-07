@@ -1,26 +1,45 @@
+/**
+ * NEUROVERBS – LEADERBOARD (SAFE)
+ */
 
-/* LEADERBOARD SAFE */
 (function(){
- if(window.__LB__) return; window.__LB__=1;
- let offset=0,total=0,LIMIT=5;
- function q(id){return document.getElementById(id);}
- window.cargarLeaderboard=function(){
-  const s=q("lbStatus"),l=q("leaderboardList"),sec=q("leaderboardSection");
-  if(!s||!l||!sec) return;
-  s.textContent="Cargando ranking..."; l.innerHTML="";
-  fetch(`${EXEC_URL}?action=leaderboard&limit=${LIMIT}&offset=${offset}`)
-   .then(r=>r.json()).then(d=>{
-    if(!d.ok) throw 0;
-    total=d.total; sec.style.display="block"; s.textContent="";
-    d.rows.forEach((u,i)=>{
-      const div=document.createElement("div");
-      div.className="lbRow";
-      div.textContent=`#${offset+i+1} ${u.name} – ${u.xp} XP`;
-      l.appendChild(div);
-    });
-   }).catch(()=>s.textContent="Error ranking");
- };
- window.lbNext=()=>{if(offset+LIMIT<total){offset+=LIMIT;cargarLeaderboard();}};
- window.lbPrev=()=>{if(offset-LIMIT>=0){offset-=LIMIT;cargarLeaderboard();}};
- window.addEventListener("nv-login",()=>setTimeout(cargarLeaderboard,500));
+  if(window.__NV_LB__) return;
+  window.__NV_LB__ = true;
+
+  const LIMIT = 5;
+  let offset = 0, total = 0;
+
+  function qs(id){ return document.getElementById(id); }
+
+  window.cargarLeaderboard = function(){
+    const sec = qs("leaderboardSection");
+    const list = qs("leaderboardList");
+    const status = qs("lbStatus");
+    if(!sec||!list||!status) return;
+
+    status.textContent = "Cargando ranking...";
+    list.innerHTML = "";
+
+    fetch(`${EXEC_URL}?action=leaderboard&limit=${LIMIT}&offset=${offset}`)
+      .then(r=>r.json())
+      .then(d=>{
+        if(!d.ok) throw new Error();
+        total = d.total;
+        sec.style.display = "block";
+        status.textContent = "";
+
+        d.rows.forEach((u,i)=>{
+          const row=document.createElement("div");
+          row.className="lbRow";
+          row.innerHTML=`#${offset+i+1} ${u.name} – ${u.xp} XP`;
+          list.appendChild(row);
+        });
+      })
+      .catch(()=>status.textContent="Error cargando ranking");
+  };
+
+  window.lbNext = ()=>{ if(offset+LIMIT<total){offset+=LIMIT;cargarLeaderboard();}};
+  window.lbPrev = ()=>{ if(offset-LIMIT>=0){offset-=LIMIT;cargarLeaderboard();}};
+
+  window.addEventListener("nv-login", ()=>setTimeout(cargarLeaderboard,500));
 })();
