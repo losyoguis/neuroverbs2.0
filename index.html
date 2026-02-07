@@ -9,14 +9,24 @@
 </head>
 <body>
 <header>NEUROVERBS 2.0</header>
+
 <main>
-<button id="loginBtn">Iniciar sesión</button>
+<div id="g_id_onload"
+     data-client_id="PEGA_TU_CLIENT_ID.apps.googleusercontent.com"
+     data-callback="handleLogin">
+</div>
+
+<div class="g_id_signin" data-type="standard"></div>
+
 <div id="user"></div>
 <div id="xp"></div>
-<button onclick="addXP(10)">+10 XP</button>
-<h3>Ranking</h3>
+
+<button onclick="addXP(10)">➕ 10 XP</button>
+
+<h3>🏆 Ranking Global</h3>
 <ul id="ranking"></ul>
 </main>
+
 <script src="core.js"></script>
 <script src="neuroverbs.js"></script>
 </body>
