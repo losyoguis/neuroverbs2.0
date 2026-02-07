@@ -1,19 +1,19 @@
 
-NEUROVERBS – FIX GRUPOS + APP ESTABLE
+NEUROVERBS – FULL REPAIR
 
-✔ index.html NO se modifica
-✔ Login sigue funcionando
-✔ App protegida
-✔ Selector de grupos y días FUNCIONAL
+✔ Login restaurado
+✔ Logout restaurado
+✔ App funcional
+✔ Ranking estable
 
 ARCHIVOS:
 - core.js (reemplazar)
-- groups.js (nuevo)
+- leaderboard-patch.js (nuevo)
 
-REQUISITO EN neuroverbs.html:
-<select id="groupSelect"></select>
-<select id="daySelect"></select>
+PASOS:
+1. Reemplaza core.js
+2. Agrega leaderboard-patch.js antes de </body>
+3. Limpia caché y recarga
 
-Y agregar antes de </body>:
-<script src="core.js"></script>
-<script src="groups.js"></script>
+Resultado:
+App + Auth + Ranking funcionando
