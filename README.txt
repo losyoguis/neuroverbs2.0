@@ -1,19 +1,21 @@
 
-NEUROVERBS – FULL REPAIR
+NEUROVERBS – FIX RANKING
 
-✔ Login restaurado
-✔ Logout restaurado
-✔ App funcional
-✔ Ranking estable
+ARCHIVOS MODIFICADOS:
+- core.js (corrección definitiva del ranking)
 
-ARCHIVOS:
-- core.js (reemplazar)
-- leaderboard-patch.js (nuevo)
+QUE SE ARREGLÓ:
+- El backend devuelve { ok, total, rows }
+- El frontend ahora lee data.rows correctamente
+- Paginación funcional
+- Mensajes de error reales
 
-PASOS:
-1. Reemplaza core.js
-2. Agrega leaderboard-patch.js antes de </body>
-3. Limpia caché y recarga
+INSTRUCCIONES:
+1. Reemplaza tu core.js por este archivo.
+2. No cambies Apps Script.
+3. No cambies Google Sheets.
+4. Limpia caché del navegador (Ctrl+Shift+R).
+5. Recarga la app y baja al ranking.
 
 Resultado:
-App + Auth + Ranking funcionando
+🏆 Ranking visible y paginado.

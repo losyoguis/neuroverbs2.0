@@ -1,76 +1,75 @@
 
-/**
- * NEUROVERBS CORE – AUTH + APP FLOW (REPAIRED)
- * - Restaura login Google
- * - Restaura logout
- * - NO lógica de ranking aquí
- */
-
+// ================= NEUROVERBS CORE =================
 const EXEC_URL = "https://script.google.com/macros/s/AKfycbwWd2BDUlJGZCL-m1sbLghgcJso518lfKr4B2W4_6z6K2E4PiAEW613mkCmXb16zhZu/exec";
-const CLIENT_ID = "637468265896-5olh8rhf76setm52743tashi3vq1la67.apps.googleusercontent.com";
-const ALLOWED_DOMAIN = "iemanueljbetancur.edu.co";
 
-function decodeJwt(token){
-  const payload = token.split('.')[1];
-  return JSON.parse(atob(payload.replace(/-/g,'+').replace(/_/g,'/')));
+const LB_LIMIT = 5;
+let lbOffset = 0;
+let lbTotal = 0;
+
+// ================= LEADERBOARD =================
+function cargarLeaderboard() {
+  const status = document.getElementById("lbStatus");
+  const list = document.getElementById("leaderboardList");
+  const section = document.getElementById("leaderboardSection");
+
+  if (!status || !list || !section) return;
+
+  status.textContent = "Cargando ranking...";
+  list.innerHTML = "";
+
+  fetch(`${EXEC_URL}?action=leaderboard&limit=${LB_LIMIT}&offset=${lbOffset}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok || !Array.isArray(data.rows)) {
+        throw new Error("Formato inválido del leaderboard");
+      }
+
+      lbTotal = data.total || 0;
+
+      if (data.rows.length === 0) {
+        status.textContent = "No hay participantes aún.";
+        return;
+      }
+
+      section.style.display = "block";
+      status.textContent = "";
+
+      data.rows.forEach((u, i) => {
+        const div = document.createElement("div");
+        div.className = "lbRow";
+        div.innerHTML = `
+          <div class="lbPos">#${lbOffset + i + 1}</div>
+          <img class="lbPic" src="${u.picture || 'assets/user.png'}">
+          <div class="lbName">${u.name}</div>
+          <div class="lbXP">${u.xp} XP</div>
+        `;
+        list.appendChild(div);
+      });
+
+      document.getElementById("lbPageInfo").textContent =
+        `${Math.floor(lbOffset / LB_LIMIT) + 1}`;
+    })
+    .catch(err => {
+      console.error(err);
+      status.textContent =
+        "❌ No se pudo cargar el ranking. Revisa la URL / permisos del WebApp.";
+    });
 }
 
-function initLogin(){
-  if(!window.google || !google.accounts || !google.accounts.id) return;
-
-  google.accounts.id.initialize({
-    client_id: CLIENT_ID,
-    hd: ALLOWED_DOMAIN,
-    callback: onLogin
-  });
-
-  const btn = document.getElementById("googleBtn");
-  if(btn){
-    google.accounts.id.renderButton(btn,{ theme:"outline", size:"large" });
+function lbNext() {
+  if (lbOffset + LB_LIMIT < lbTotal) {
+    lbOffset += LB_LIMIT;
+    cargarLeaderboard();
   }
 }
 
-function onLogin(resp){
-  const payload = decodeJwt(resp.credential);
-  if(!payload.email.endsWith("@"+ALLOWED_DOMAIN)){
-    alert("Solo correo institucional");
-    return;
+function lbPrev() {
+  if (lbOffset - LB_LIMIT >= 0) {
+    lbOffset -= LB_LIMIT;
+    cargarLeaderboard();
   }
-
-  localStorage.setItem("mjb_user", JSON.stringify({
-    name: payload.name,
-    email: payload.email,
-    picture: payload.picture,
-    sub: payload.sub
-  }));
-
-  document.getElementById("userName").textContent = payload.name;
-  document.getElementById("userEmail").textContent = payload.email;
-  document.getElementById("userPic").src = payload.picture;
-
-  document.getElementById("userChip").style.display = "flex";
-  document.getElementById("googleBtn").style.display = "none";
-
-  // Avisar al ranking
-  window.dispatchEvent(new Event("nv-login"));
 }
 
-function logout(){
-  localStorage.removeItem("mjb_user");
-  location.reload();
-}
-
-window.addEventListener("DOMContentLoaded", ()=>{
-  initLogin();
-
-  const raw = localStorage.getItem("mjb_user");
-  if(raw){
-    const u = JSON.parse(raw);
-    document.getElementById("userName").textContent = u.name;
-    document.getElementById("userEmail").textContent = u.email;
-    document.getElementById("userPic").src = u.picture;
-    document.getElementById("userChip").style.display = "flex";
-    document.getElementById("googleBtn").style.display = "none";
-    window.dispatchEvent(new Event("nv-login"));
-  }
+window.addEventListener("DOMContentLoaded", () => {
+  setTimeout(cargarLeaderboard, 800);
 });
