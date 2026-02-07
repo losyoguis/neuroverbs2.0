@@ -1,75 +1,37 @@
+/**
+ * NEUROVERBS CORE – APP + AUTH
+ */
 
-// ================= NEUROVERBS CORE =================
 const EXEC_URL = "https://script.google.com/macros/s/AKfycbwWd2BDUlJGZCL-m1sbLghgcJso518lfKr4B2W4_6z6K2E4PiAEW613mkCmXb16zhZu/exec";
 
-const LB_LIMIT = 5;
-let lbOffset = 0;
-let lbTotal = 0;
-
-// ================= LEADERBOARD =================
-function cargarLeaderboard() {
-  const status = document.getElementById("lbStatus");
-  const list = document.getElementById("leaderboardList");
-  const section = document.getElementById("leaderboardSection");
-
-  if (!status || !list || !section) return;
-
-  status.textContent = "Cargando ranking...";
-  list.innerHTML = "";
-
-  fetch(`${EXEC_URL}?action=leaderboard&limit=${LB_LIMIT}&offset=${lbOffset}`)
-    .then(r => r.json())
-    .then(data => {
-      if (!data.ok || !Array.isArray(data.rows)) {
-        throw new Error("Formato inválido del leaderboard");
-      }
-
-      lbTotal = data.total || 0;
-
-      if (data.rows.length === 0) {
-        status.textContent = "No hay participantes aún.";
-        return;
-      }
-
-      section.style.display = "block";
-      status.textContent = "";
-
-      data.rows.forEach((u, i) => {
-        const div = document.createElement("div");
-        div.className = "lbRow";
-        div.innerHTML = `
-          <div class="lbPos">#${lbOffset + i + 1}</div>
-          <img class="lbPic" src="${u.picture || 'assets/user.png'}">
-          <div class="lbName">${u.name}</div>
-          <div class="lbXP">${u.xp} XP</div>
-        `;
-        list.appendChild(div);
-      });
-
-      document.getElementById("lbPageInfo").textContent =
-        `${Math.floor(lbOffset / LB_LIMIT) + 1}`;
-    })
-    .catch(err => {
-      console.error(err);
-      status.textContent =
-        "❌ No se pudo cargar el ranking. Revisa la URL / permisos del WebApp.";
-    });
+function getUser(){
+  try{ return JSON.parse(localStorage.getItem("mjb_user")); }
+  catch(e){ return null; }
 }
 
-function lbNext() {
-  if (lbOffset + LB_LIMIT < lbTotal) {
-    lbOffset += LB_LIMIT;
-    cargarLeaderboard();
+function logout(){
+  localStorage.removeItem("mjb_user");
+  window.location.href = "index.html";
+}
+
+window.addEventListener("DOMContentLoaded", ()=>{
+  const user = getUser();
+  if(!user){
+    // Si alguien entra directo a neuroverbs.html sin login
+    window.location.href = "index.html";
+    return;
   }
-}
 
-function lbPrev() {
-  if (lbOffset - LB_LIMIT >= 0) {
-    lbOffset -= LB_LIMIT;
-    cargarLeaderboard();
-  }
-}
+  const nameEl = document.getElementById("userName");
+  const emailEl = document.getElementById("userEmail");
+  const picEl = document.getElementById("userPic");
 
-window.addEventListener("DOMContentLoaded", () => {
-  setTimeout(cargarLeaderboard, 800);
+  if(nameEl) nameEl.textContent = user.name;
+  if(emailEl) emailEl.textContent = user.email;
+  if(picEl) picEl.src = user.picture;
+
+  const chip = document.getElementById("userChip");
+  if(chip) chip.style.display = "flex";
+
+  window.dispatchEvent(new Event("nv-login"));
 });

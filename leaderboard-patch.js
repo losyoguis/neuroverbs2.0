@@ -1,6 +1,5 @@
-
 /**
- * NEUROVERBS LEADERBOARD – SAFE
+ * NEUROVERBS – LEADERBOARD (SAFE)
  */
 
 (function(){
@@ -24,7 +23,7 @@
     fetch(`${EXEC_URL}?action=leaderboard&limit=${LIMIT}&offset=${offset}`)
       .then(r=>r.json())
       .then(d=>{
-        if(!d.ok) throw new Error("bad data");
+        if(!d.ok) throw new Error();
         total = d.total;
         sec.style.display = "block";
         status.textContent = "";
@@ -32,7 +31,7 @@
         d.rows.forEach((u,i)=>{
           const row=document.createElement("div");
           row.className="lbRow";
-          row.innerHTML=`<b>#${offset+i+1}</b> ${u.name} – ${u.xp} XP`;
+          row.innerHTML=`#${offset+i+1} ${u.name} – ${u.xp} XP`;
           list.appendChild(row);
         });
       })
